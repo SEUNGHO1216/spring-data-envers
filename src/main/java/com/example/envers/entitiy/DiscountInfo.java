@@ -1,7 +1,10 @@
-package com.example.envers;
+package com.example.envers.entitiy;
 
+import com.querydsl.core.annotations.QueryEntities;
 import lombok.*;
 import org.hibernate.envers.Audited;
+import org.hibernate.envers.DefaultRevisionEntity;
+import org.hibernate.envers.RevisionEntity;
 import org.springframework.lang.Nullable;
 
 import javax.persistence.Entity;
@@ -14,7 +17,8 @@ import javax.persistence.Id;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Audited
+@Audited(withModifiedFlag = true)
+//@RevisionEntity
 public class DiscountInfo extends BaseEntity {
 
   @Id

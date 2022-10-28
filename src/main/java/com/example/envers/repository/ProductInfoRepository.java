@@ -1,5 +1,6 @@
-package com.example.envers;
+package com.example.envers.repository;
 
+import com.example.envers.entitiy.ProductInfo;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.history.RevisionRepository;
 
