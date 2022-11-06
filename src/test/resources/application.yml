@@ -12,3 +12,7 @@ spring:
       hibernate:
         show_sql: true
         format_sql: true
+org:
+  hibernate:
+    envers:
+      store_data_at_delete: true

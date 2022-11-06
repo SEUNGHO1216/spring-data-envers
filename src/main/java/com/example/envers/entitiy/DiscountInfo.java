@@ -2,15 +2,14 @@ package com.example.envers.entitiy;
 
 import com.querydsl.core.annotations.QueryEntities;
 import lombok.*;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 import org.hibernate.envers.Audited;
 import org.hibernate.envers.DefaultRevisionEntity;
 import org.hibernate.envers.RevisionEntity;
 import org.springframework.lang.Nullable;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 @Getter
@@ -18,7 +17,9 @@ import javax.persistence.Id;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Audited(withModifiedFlag = true)
-//@RevisionEntity
+@Table(name = "discount_info")
+@SQLDelete(sql = "UPDATE discount_info SET deleted = true WHERE id=?")
+@Where(clause = "deleted=false")
 public class DiscountInfo extends BaseEntity {
 
   @Id
@@ -30,7 +31,9 @@ public class DiscountInfo extends BaseEntity {
   private Integer discountPrice;
 
   @Nullable
-  private Long ProductId;
+  private Long productId;
+
+  private Boolean deleted = Boolean.FALSE;
 
   public static DiscountInfo create(String name, Integer discountPrice, @Nullable Long productId){
     DiscountInfo discountInfo = new DiscountInfo();
@@ -49,6 +52,11 @@ public class DiscountInfo extends BaseEntity {
 
   public DiscountInfo applyToProduct(Long targetProductId){
     this.setProductId(targetProductId);
+    return this;
+  }
+
+  public DiscountInfo recover(){
+    this.setDeleted(true);
     return this;
   }
 }

@@ -43,11 +43,11 @@ class ProductInfoTest {
   @Rollback(value = false)
   public void createProductAndDiscountTest() {
     // 상품 한개 만들기
-    ProductInfo productInfo = new ProductInfo(null, "상품4", 12000);
-    productInfoRepository.save(productInfo);
+    ProductInfo createProduct = ProductInfo.create("상품4", 12000);
+    productInfoRepository.save(createProduct);
     // 할인 한개 만들기
-    DiscountInfo discountInfo = new DiscountInfo(null, "할인3", 4000, null);
-    discountInfoRepository.save(discountInfo);
+    DiscountInfo createDiscount = DiscountInfo.create("할인3", 4000, null);
+    discountInfoRepository.save(createDiscount);
   }
 
   @Test
@@ -70,7 +70,7 @@ class ProductInfoTest {
   @Rollback(value = false)
   public void 생성과_할인적용_트랜잭션() {
     // 상품 한개 만들기
-    ProductInfo productInfo = new ProductInfo(null, "상품_생성과할인", 10000);
+    ProductInfo productInfo = ProductInfo.create("상품_생성과할인", 10000);
     Long createdId = productInfoRepository.save(productInfo).getId();
     // 1번 할인을 생성된 상품에 바로 적용(즉 한 트랜잭션에 생성과 수정이 같은 내역 번호로 들어가나 확인)
     discountInfoRepository.findById(1L).get().applyToProduct(createdId);
@@ -103,25 +103,25 @@ class ProductInfoTest {
         //UNKNOWN, INSERT, UPDATE, DELETE 중 리비전 타입 반환
         log.info("result.getMetadata().getRevisionType() >>" + result.getMetadata().getRevisionType());
         //----- metadata가 아니어도 바로 뽑아올 수 있다! -----//
-        log.info("result.getRevisionNumber() >>"+result.getRevisionNumber());
-        log.info("result.getRequiredRevisionNumber() >>"+result.getRequiredRevisionNumber());
-        log.info("result.getRevisionInstant() >>"+result.getRevisionInstant());
-        log.info("result.getRequiredRevisionInstant() >>"+result.getRequiredRevisionInstant());
+        log.info("result.getRevisionNumber() >>" + result.getRevisionNumber());
+        log.info("result.getRequiredRevisionNumber() >>" + result.getRequiredRevisionNumber());
+        log.info("result.getRevisionInstant() >>" + result.getRevisionInstant());
+        log.info("result.getRequiredRevisionInstant() >>" + result.getRequiredRevisionInstant());
       }
     );
   }
 
   @Test
-  public void getFindLastChangeRevision(){
+  public void getFindLastChangeRevision() {
     //한 엔티티 객체의 여러 변경 내역이 있다면 가장 최신 정보 가져오기
     Optional<Revision<Integer, DiscountInfo>> lastChangeRevision = discountInfoRepository.findLastChangeRevision(2L);
-    log.info("최신 내역 리비전 번호 >> {}",lastChangeRevision.get().getRequiredRevisionNumber());
+    log.info("최신 내역 리비전 번호 >> {}", lastChangeRevision.get().getRequiredRevisionNumber());
     log.info("최신 내역 타임스탬프 >> {}", lastChangeRevision.get().getRequiredRevisionInstant());
     log.info("최신 내역 리비전 타입 >> {}", lastChangeRevision.get().getMetadata().getRevisionType());
   }
 
   @Test
-  public void getFindRevisionsPage(){
+  public void getFindRevisionsPage() {
 
     //한 엔티티 객체의 모든 내역 페이징
     //결과 -> 페이징은 되는데 정렬이 안 됨
@@ -134,7 +134,7 @@ class ProductInfoTest {
       });
     // AuditOrder auditOrder = AuditOrder.OrderData;
     Sort.Direction direction = Sort.Direction.DESC;
-    Sort sort= Sort.by(direction, "modifiedDate");
+    Sort sort = Sort.by(direction, "modifiedDate");
     Page<Revision<Integer, ProductInfo>> rev =
       productInfoRepository.findRevisions(2L, PageRequest.of(0, 2, sort));
 
@@ -142,16 +142,16 @@ class ProductInfoTest {
     log.info("rev.getTotalPages() >> {}", rev.getTotalPages());
     AtomicInteger orderCnt = new AtomicInteger(0);
     rev.getContent().stream()
-        .forEach(result -> {
-          orderCnt.getAndIncrement();
-          log.info("상품 아이디 >> {}", result.getEntity().getId());
-          log.info("{}번째 결과 리비전 넘버 >> {}", orderCnt, result.getRequiredRevisionNumber());
-          log.info("{}번째 결과 리비전 타임스탬프 >> {}", orderCnt, result.getRequiredRevisionInstant());
-        });
+      .forEach(result -> {
+        orderCnt.getAndIncrement();
+        log.info("상품 아이디 >> {}", result.getEntity().getId());
+        log.info("{}번째 결과 리비전 넘버 >> {}", orderCnt, result.getRequiredRevisionNumber());
+        log.info("{}번째 결과 리비전 타임스탬프 >> {}", orderCnt, result.getRequiredRevisionInstant());
+      });
   }
 
   @Test
-  public void getPageTest3(){
+  public void getPageTest3() {
     List<DiscountInfo> result = auditReader.createQuery()
       .forRevisionsOfEntity(DiscountInfo.class, true, true)
       .add(AuditEntity.id().eq(2L))
@@ -162,8 +162,8 @@ class ProductInfoTest {
 
     result.stream()
       .forEach(r -> {
-        log.info("r.getModifiedBy() >>"+r.getModifiedBy());
-        log.info("r.getName() >>"+r.getName());
+        log.info("r.getModifiedBy() >>" + r.getModifiedBy());
+        log.info("r.getName() >>" + r.getName());
       });
   }
 }
